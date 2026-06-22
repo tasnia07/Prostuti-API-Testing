@@ -1,0 +1,922 @@
+{
+  "info": {
+    "_postman_id": "954ea84a-7d5f-420a-a3ac-967d75e1a583",
+    "name": "Prostuti",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31256172"
+  },
+  "item": [
+    {
+      "name": "Section-A",
+      "item": [
+        {
+          "name": "A1-List Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();\r",
+                  "\r",
+                  "// 1. Assert status code is 200\r",
+                  "pm.test(\"A1.1 - Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "// 2 - Verify the global envelope structure\r",
+                  "pm.test(\"A1.2 - Success wrapper includes data and message\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('data');\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData.message).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "// 3. Assert response body 'data' is an array\r",
+                  "pm.test(\"A1.3 - Response contains a collection of items\", function () {\r",
+                  "    pm.expect(responseData.data.data).to.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "//4. Assert response body has pagination\r",
+                  "pm.test(\"A1.4 - Response contains pagination information\", function () {\r",
+                  "    pm.expect(responseData.data).to.have.property('current_page');\r",
+                  "    pm.expect(responseData.data).to.have.property('per_page');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "A2-Create an item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Dynamically store the id\r",
+                  "\r",
+                  "var responseData = pm.response.json();\r",
+                  "pm.environment.set(\"id\", responseData.data.id)\r",
+                  "\r",
+                  "// Dynamically parse the outbound Request Body\r",
+                  "var requestData = JSON.parse(pm.request.body.raw);\r",
+                  "\r",
+                  "// A2.1 - Assert status code is 201 Created\r",
+                  "pm.test(\"A2.1 - Status Code is 201 Created\", function (){\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "// A2.2 - Verify the global envelope structure\r",
+                  "pm.test(\"A2.2 - Success wrapper includes data and message\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('data');\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData.message).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "// A2.3 - Assert response contains a generated ID\r",
+                  "pm.test(\"A2.3 - Response contains a generated id\", function () {\r",
+                  "    pm.expect(responseData.data).to.have.property('id');\r",
+                  "});\r",
+                  "\r",
+                  "// A2.4 - DYNAMIC ASSERTION: Matches request body directly with response body\r",
+                  "pm.test(\"A2.4 - Returned fields dynamically match the sent request body\", function () {\r",
+                  "    pm.expect(responseData.data.title).to.eql(requestData.title);\r",
+                  "    pm.expect(responseData.data.status).to.eql(requestData.status);\r",
+                  "    pm.expect(responseData.data.priority).to.eql(requestData.priority);\r",
+                  "    \r",
+                  "    // Dynamically checks description if it was provided in the request\r",
+                  "    if (requestData.description) {\r",
+                  "        pm.expect(responseData.data.description).to.eql(requestData.description);\r",
+                  "    }\r",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Buy groceries\",\r\n  \"description\": \"Pick up milk, eggs, and bread\",\r\n  \"status\": \"pending\",\r\n  \"priority\": 3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "A3-Read the created item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse the JSON response globally\r",
+                  "var responseData = pm.response.json();\r",
+                  "\r",
+                  "// A3.1 - Assert status code is 200\r",
+                  "pm.test(\"A3.1 - Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// A3.2 - Verify the global envelope structure\r",
+                  "pm.test(\"A3.2 - Success wrapper includes data and message\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('data');\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData.message).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "// A3.3 - Deep Body Field Assertions\r",
+                  "pm.test(\"A3.3 - Returned fields match the item\", function () {\r",
+                  "    var item = responseData.data;\r",
+                  "    \r",
+                  "    // Assert the ID matches the one we requested from the environment\r",
+                  "    pm.expect(item.id).to.eql(Number(pm.environment.get(\"id\")));\r",
+                  "    \r",
+                  "    // Verify properties exist and match valid data types\r",
+                  "    pm.expect(item).to.have.property('title');\r",
+                  "    pm.expect(item.title).to.be.a('string');\r",
+                  "    \r",
+                  "    pm.expect(item).to.have.property('status');\r",
+                  "    pm.expect(['pending', 'active', 'done']).to.include(item.status); \r",
+                  "    \r",
+                  "    pm.expect(item).to.have.property('priority');\r",
+                  "    pm.expect(item.priority).to.be.a('number').within(1, 5); \r",
+                  "\r",
+                  "    pm.expect(item).to.have.property('description');\r",
+                  "    if (item.description) {\r",
+                  "        pm.expect(item.description).to.be.a('string');\r",
+                  "    }\r",
+                  "    \r",
+                  "    // Check system-generated timestamps\r",
+                  "    pm.expect(item).to.have.property('created_at');\r",
+                  "    pm.expect(item).to.have.property('updated_at');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/items/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "A4-Update the item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse response and request bodies dynamically\r",
+                  "var responseData = pm.response.json();\r",
+                  "var requestData = JSON.parse(pm.request.body.raw);\r",
+                  "\r",
+                  "// A4.1 - Assert status code is 200 OK\r",
+                  "pm.test(\"A4.1 - Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// A4.2 - Verify Global Envelope Structure\r",
+                  "pm.test(\"A4.2 - Success wrapper includes data and message\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('data');\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData.message).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "// A4.3 - Deep Body Field Assertions (Full Data Integrity Check)\r",
+                  "pm.test(\"A4.3 - Returned fields dynamically match the updated request body\", function () {\r",
+                  "    var updatedItem = responseData.data;\r",
+                  "\r",
+                  "    // 1. Prove the ID is identical to our original item\r",
+                  "    pm.expect(updatedItem.id).to.eql(Number(pm.environment.get(\"id\")));\r",
+                  "\r",
+                  "    // 2. Prove the PATCH update actually applied\r",
+                  "    pm.expect(updatedItem.status).to.eql(requestData.status);\r",
+                  "\r",
+                  "    // 3. Data Integrity: Assert that core fields still exist and hold valid values\r",
+                  "    pm.expect(updatedItem).to.have.property('title');\r",
+                  "    pm.expect(updatedItem.title).to.be.a('string');\r",
+                  "    \r",
+                  "    pm.expect(updatedItem).to.have.property('priority');\r",
+                  "    pm.expect(updatedItem.priority).to.be.a('number').within(1, 5);\r",
+                  "\r",
+                  "    pm.expect(updatedItem).to.have.property('description');\r",
+                  "    if (updatedItem.description) {\r",
+                  "        pm.expect(updatedItem.description).to.be.a('string');\r",
+                  "    }\r",
+                  "\r",
+                  "    // 4. Check that the server updated the modification timestamp\r",
+                  "    pm.expect(updatedItem).to.have.property('updated_at');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"done\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/items/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "A5-Delete the item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse the JSON response globally\r",
+                  "var responseData = pm.response.json();\r",
+                  "\r",
+                  "// A5.1 - Assert status code is 200 OK\r",
+                  "pm.test(\"A5.1 - Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// A5.2 - Verify response body fields match exactly what the server returned\r",
+                  "pm.test(\"A5.2 - Response contains a clear success message and deleted item ID\", function () {\r",
+                  "    // Assert global wrapper properties exist\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData).to.have.property('data');\r",
+                  "    \r",
+                  "    // Explicitly verify the success message text \r",
+                  "    pm.expect(responseData.message).to.eql(\"Item deleted successfully.\");\r",
+                  "    \r",
+                  "    // Dynamically verify that the ID inside 'data' matches the item we intended to delete\r",
+                  "    pm.expect(responseData.data).to.have.property('id');\r",
+                  "    pm.expect(responseData.data.id).to.eql(Number(pm.environment.get(\"id\")));\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/items/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "A6-Confirm deletion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse the JSON response globally\r",
+                  "var responseData = pm.response.json();\r",
+                  "\r",
+                  "// A6.1 - Assert status code is 404 (Item Not Found)\r",
+                  "pm.test(\"A6.1 - Status code is 404 Not Found\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "// A6.2 - Verify negative error response body fields match exactly\r",
+                  "pm.test(\"A6.2 - Response contains the item not found structure\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData).to.have.property('errors');\r",
+                  "    \r",
+                  "    // Explicitly verify the exact error message text\r",
+                  "    pm.expect(responseData.message).to.eql(\"Item not found.\");\r",
+                  "    \r",
+                  "    // Check that errors is an array as returned by the backend\r",
+                  "    pm.expect(responseData.errors).to.be.an('array');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/items/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "A7-Reject invalid create",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse the JSON response globally\r",
+                  "var responseData = pm.response.json();\r",
+                  "\r",
+                  "// A7.1 - Assert status code is 422 Unprocessable Entity\r",
+                  "pm.test(\"A7.1 - Status code is 422 Unprocessable Entity\", function () {\r",
+                  "    pm.response.to.have.status(422);\r",
+                  "});\r",
+                  "\r",
+                  "// A7.2 - Verify validation failure structure AND the targeted title entry\r",
+                  "pm.test(\"A7.2 - Response contains validation errors object targeting the missing title\", function () {\r",
+                  "    // 1. Structural Check: Verify global error wrapper format exists\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData).to.have.property('errors');\r",
+                  "    \r",
+                  "    // 2. Focused Check: Confirm the errors object explicitly contains the title\r",
+                  "    pm.expect(responseData.errors).to.have.property('title');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"description\": \"Trying to create an item without a title\",\r\n  \"status\": \"pending\",\r\n  \"priority\": 3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "items"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section-B",
+      "item": [
+        {
+          "name": "B1-Valid submission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. Parse the JSON response globally\r",
+                  "var responseData = pm.response.json();\r",
+                  "\r",
+                  "// B1.1 - Assert status code is 200 OK\r",
+                  "pm.test(\"B1.1 - Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// B1.2 - Deep Structural and Message Contract Assertions\r",
+                  "pm.test(\"B1.2 - Response includes global validation success envelope and message\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('message');\r",
+                  "    pm.expect(responseData).to.have.property('data');\r",
+                  "    \r",
+                  "    // This matches \"Validation passed.\", \"validation pass\", \"Passed\", etc.\r",
+                  "    pm.expect(responseData.message).to.match(/pass|success/i);\r",
+                  "    \r",
+                  "    pm.expect(responseData.data).to.be.an('object');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Zayan Ahmed\",\r\n  \"email\": \"zayan.ahmed@example.com\",\r\n  \"age\": 25,\r\n  \"phone\": \"01712345678\",\r\n  \"password\": \"SecurePassword123\",\r\n  \"password_confirmation\": \"SecurePassword123\",\r\n  \"gender\": \"male\",\r\n  \"website\": \"https://myportfolio.com\",\r\n  \"terms\": true,\r\n  \"hobbies\": [\"reading\", \"coding\", \"gaming\"]\r\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/validate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "validate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "B2-Invalid submission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse the JSON response globally\r",
+                  "var responseData = pm.response.json();\r",
+                  "var requestData = JSON.parse(pm.request.body);\r",
+                  "\r",
+                  "// B2.1 - Assert status code is 422 Unprocessable Entity\r",
+                  "pm.test(\"B2.1 - Status code is 422 Unprocessable Entity\", function () {\r",
+                  "    pm.response.to.have.status(422);\r",
+                  "});\r",
+                  "\r",
+                  "// B2.2 - Explicitly assert that the response has an errors object\r",
+                  "pm.test(\"B2.2 - Response contains a valid errors object\", function () {\r",
+                  "    pm.expect(responseData).to.have.property('errors');\r",
+                  "    pm.expect(responseData.errors).to.be.an('object'); \r",
+                  "});\r",
+                  "\r",
+                  "// B3.3 - Dynamic Request Body Boundary Evaluation for Name, Age, and Phone\r",
+                  "pm.test(\"B2.3 - Sent payload fields sit exactly on valid table boundary limits\", function () {\r",
+                  "    pm.expect(responseData.errors).to.have.property('name');\r",
+                  "    pm.expect(responseData.errors).to.have.property('age');\r",
+                  "    pm.expect(responseData.errors).to.have.property('phone');\r",
+                  "\r",
+                  " // 1. Evaluate Name boundary rule (3–50 characters inclusive)\r",
+                  "    var nameLength = requestData.name.length;\r",
+                  "    var isNameLengthInvalid = (nameLength < 3 || nameLength > 50);\r",
+                  "    pm.expect(isNameLengthInvalid, \"Name length should be outside the valid 3-50 range\").to.be.true;\r",
+                  "    pm.expect(responseData.errors).to.have.property('name');\r",
+                  "    \r",
+                  "    // 2. Evaluate Age boundary rule (Integer, strictly 18 or above)\r",
+                  "var ageValue = Number(requestData.age);\r",
+                  "    var isAgeInvalid = (ageValue < 18 || ageValue > 100);\r",
+                  "    pm.expect(isAgeInvalid, \"Age value should be outside the valid 18-100 range to trigger failure\").to.be.true;\r",
+                  "    \r",
+                  "    // 3. Evaluate Phone rule - Condition 1: Must be exactly 11 characters long\r",
+                  "    var phoneLength = requestData.phone.length;\r",
+                  "    var startsWith01 = requestData.phone.startsWith(\"01\");\r",
+                  "    var isPhoneInvalid = (phoneLength !== 11 || !startsWith01);\r",
+                  "    pm.expect(isPhoneInvalid, \"Phone number should fail length or prefix rules\").to.be.true;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"John Jacob Jingleheimer Schmidt Fletcher of Dhaka50\",\r\n  \"email\": \"al@domain.com\",\r\n  \"age\": 12,\r\n  \"phone\": \"123456\",\r\n  \"password\": \"DifferentPassword123\",\r\n  \"password_confirmation\": \"DifferentPassword123\",\r\n  \"gender\": \"male\",\r\n  \"website\": \"www.demourl.com\",\r\n  \"terms\": true,\r\n  \"hobbies\": \"[dancing,singing]\"\r\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/validate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "validate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Section-C",
+      "item": [
+        {
+          "name": "C1-Data-driven field validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. Parse the sent request body\r",
+                  "const requestBody = JSON.parse(pm.request.body.raw);\r",
+                  "\r",
+                  "// 2. Programmatically determine which field was broken and assign its task number\r",
+                  "let taskNumber = \"C1.unknown\";\r",
+                  "let detectedBrokenField = \"unknown\";\r",
+                  "\r",
+                  "if (requestBody.name.length < 3 || requestBody.name.length > 50) {\r",
+                  "    taskNumber = \"C1.1\";\r",
+                  "    detectedBrokenField = \"name\";\r",
+                  "} else if (requestBody.age < 18 || requestBody.age > 100) {\r",
+                  "    taskNumber = \"C1.2\";\r",
+                  "    detectedBrokenField = \"age\";\r",
+                  "} else if (requestBody.phone.length < 11 || !requestBody.phone.startsWith(\"01\")) {\r",
+                  "    taskNumber = \"C1.3\";\r",
+                  "    detectedBrokenField = \"phone\";\r",
+                  "} else if (requestBody.terms !== true) {\r",
+                  "    taskNumber = \"C1.4\";\r",
+                  "    detectedBrokenField = \"terms\";\r",
+                  "}\r",
+                  "\r",
+                  "// 3. Exactly 2 assertions per iteration\r",
+                  "pm.test(`[${taskNumber}] - Status code is 422 Unprocessable Entity`, function () {\r",
+                  "    pm.response.to.have.status(422);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(`[${taskNumber}] - Errors object contains entry for: \"${detectedBrokenField}\"`, function () {\r",
+                  "    const responseJson = pm.response.json();\r",
+                  "    pm.expect(responseJson).to.have.property('errors');\r",
+                  "    pm.expect(responseJson.errors).to.have.property(detectedBrokenField);\r",
+                  "});\r",
+                  "\r",
+                  "// 4. LOOP CONTROL: Read index, increment it safely\r",
+                  "let currentIteration = pm.collectionVariables.get(\"currentIteration\");\r",
+                  "\r",
+                  "if (currentIteration === undefined || currentIteration === null || currentIteration === \"\") {\r",
+                  "    currentIteration = 0;\r",
+                  "} else {\r",
+                  "    currentIteration = parseInt(currentIteration, 10);\r",
+                  "}\r",
+                  "\r",
+                  "currentIteration++;\r",
+                  "\r",
+                  "// 5. FIX: Use classic postman.setNextRequest for universal Newman compatibility\r",
+                  "if (currentIteration < 4) {\r",
+                  "    pm.collectionVariables.set(\"currentIteration\", currentIteration);\r",
+                  "    postman.setNextRequest(pm.info.requestName); \r",
+                  "} else {\r",
+                  "    // Loop complete! Reset back to 0 for a clean state\r",
+                  "    pm.collectionVariables.set(\"currentIteration\", 0);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"age\": {{age}},\r\n  \"phone\": \"{{phone}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"password_confirmation\": \"{{password_confirmation}}\",\r\n  \"gender\": \"{{gender}}\",\r\n  \"website\": \"{{website}}\",\r\n  \"terms\": {{terms}},\r\n  \"hobbies\": {{hobbies}}\r\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/validate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "validate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "// Define the 4 clean data test cases directly in code\r",
+              "const dataDrivenSuite = [\r",
+              "  {\r",
+              "    \"name\": \"An\",\r",
+              "    \"email\": \"johndoe@example.com\",\r",
+              "    \"age\": 25,\r",
+              "    \"phone\": \"01712345678\",\r",
+              "    \"password\": \"SecurePassword123\",\r",
+              "    \"password_confirmation\": \"SecurePassword123\",\r",
+              "    \"gender\": \"male\",\r",
+              "    \"website\": \"https://example.com\",\r",
+              "    \"terms\": true,\r",
+              "    \"hobbies\": [\"reading\", \"coding\"]\r",
+              "  },\r",
+              "  {\r",
+              "    \"name\": \"John Doe\",\r",
+              "    \"email\": \"johndoe@example.com\",\r",
+              "    \"age\": 15,\r",
+              "    \"phone\": \"01712345678\",\r",
+              "    \"password\": \"SecurePassword123\",\r",
+              "    \"password_confirmation\": \"SecurePassword123\",\r",
+              "    \"gender\": \"male\",\r",
+              "    \"website\": \"https://example.com\",\r",
+              "    \"terms\": true,\r",
+              "    \"hobbies\": [\"reading\", \"coding\"]\r",
+              "  },\r",
+              "  {\r",
+              "    \"name\": \"John Doe\",\r",
+              "    \"email\": \"johndoe@example.com\",\r",
+              "    \"age\": 25,\r",
+              "    \"phone\": \"12345\",\r",
+              "    \"password\": \"SecurePassword123\",\r",
+              "    \"password_confirmation\": \"SecurePassword123\",\r",
+              "    \"gender\": \"male\",\r",
+              "    \"website\": \"https://example.com\",\r",
+              "    \"terms\": true,\r",
+              "    \"hobbies\": [\"reading\", \"coding\"]\r",
+              "  },\r",
+              "  {\r",
+              "    \"name\": \"John Doe\",\r",
+              "    \"email\": \"johndoe@example.com\",\r",
+              "    \"age\": 25,\r",
+              "    \"phone\": \"01712345678\",\r",
+              "    \"password\": \"SecurePassword123\",\r",
+              "    \"password_confirmation\": \"SecurePassword123\",\r",
+              "    \"gender\": \"male\",\r",
+              "    \"website\": \"https://example.com\",\r",
+              "    \"terms\": false,\r",
+              "    \"hobbies\": [\"reading\", \"coding\"]\r",
+              "  }\r",
+              "];\r",
+              "\r",
+              "// Get the current loop index (default to 0 if it doesn't exist yet)\r",
+              "// Get the current loop index safely\r",
+              "let currentIteration = pm.collectionVariables.get(\"currentIteration\");\r",
+              "\r",
+              "// Safety guard: Reset if undefined, empty, or out of bounds (>= 4)\r",
+              "if (currentIteration === undefined || currentIteration === null || currentIteration === \"\" || parseInt(currentIteration, 10) >= 4) {\r",
+              "    currentIteration = 0;\r",
+              "    pm.collectionVariables.set(\"currentIteration\", 0);\r",
+              "} else {\r",
+              "    currentIteration = parseInt(currentIteration, 10);\r",
+              "}\r",
+              "\r",
+              "// Grab the current active test case scenario safely\r",
+              "const currentCase = dataDrivenSuite[currentIteration];\r",
+              "\r",
+              "// Inject the active case's data into variables\r",
+              "pm.collectionVariables.set(\"name\", currentCase.name);\r",
+              "pm.collectionVariables.set(\"email\", currentCase.email);\r",
+              "pm.collectionVariables.set(\"age\", currentCase.age);\r",
+              "pm.collectionVariables.set(\"phone\", currentCase.phone);\r",
+              "pm.collectionVariables.set(\"password\", currentCase.password);\r",
+              "pm.collectionVariables.set(\"password_confirmation\", currentCase.password_confirmation);\r",
+              "pm.collectionVariables.set(\"gender\", currentCase.gender);\r",
+              "pm.collectionVariables.set(\"website\", currentCase.website);\r",
+              "pm.collectionVariables.set(\"terms\", currentCase.terms);\r",
+              "pm.collectionVariables.set(\"hobbies\", JSON.stringify(currentCase.hobbies));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "jwt",
+    "jwt": [
+      {
+        "key": "algorithm",
+        "value": "HS256",
+        "type": "string"
+      },
+      {
+        "key": "isSecretBase64Encoded",
+        "value": false,
+        "type": "boolean"
+      },
+      {
+        "key": "payload",
+        "value": "{}",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "headerPrefix",
+        "value": "Bearer",
+        "type": "string"
+      },
+      {
+        "key": "queryParamKey",
+        "value": "token",
+        "type": "string"
+      },
+      {
+        "key": "header",
+        "value": "{}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          "pm.request.headers.add({ key: 'Accept', value: 'application/json' });\r",
+          "pm.request.headers.add({ key: 'Content-Type', value: 'application/json' });\r",
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "name",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "age",
+      "value": ""
+    },
+    {
+      "key": "phone",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "password_confirmation",
+      "value": ""
+    },
+    {
+      "key": "gender",
+      "value": ""
+    },
+    {
+      "key": "website",
+      "value": ""
+    },
+    {
+      "key": "terms",
+      "value": ""
+    },
+    {
+      "key": "hobbies",
+      "value": ""
+    },
+    {
+      "key": "currentIteration",
+      "value": ""
+    }
+  ]
+}
