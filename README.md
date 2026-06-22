@@ -37,3 +37,7 @@ To run the entire test suite using Newman Report from your terminal, execute the
 
 ```bash
 newman run Prostuti.postman_collection.json -e Prostuti.postman_environment.json -r cli,htmlextra
+```
+### View Live HTML Reports
+You can view the latest automated test execution results directly online here:
+**[View Live Newman Test Report](https://tasnia07.github.io/Prostuti-API-Testing/Newman%20Report.html)**
