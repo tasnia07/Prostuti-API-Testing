@@ -32,8 +32,8 @@ Before running the test suite, ensure you have the following tools installed on 
 5. In the top-right corner of Postman, ensure you select your newly imported environment from the environment dropdown menu.
 6. Select the Prostuti collection folder in your sidebar, click **Run Collection** and keep the iteration=1.
 
-### Step 2: Running via CLI (Command Line Interface)
-To run the entire test suite instantly from your terminal, execute the following command in your project root directory:
+### Step 2: Running via CLI (Command Line Interface) with Newman Report
+To run the entire test suite using Newman Report from your terminal, execute the following command in your project root directory:
 
 ```bash
 newman run Prostuti.postman_collection.json -e Prostuti.postman_environment.json -r cli,htmlextra
