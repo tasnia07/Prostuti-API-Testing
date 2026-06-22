@@ -27,9 +27,9 @@ Before running the test suite, ensure you have the following tools installed on 
 ### Step 1: Running via Postman App (UI View)
 1. Launch the **Postman** application.
 2. Click on the **Import** button in the top-left corner.
-3. Select and upload the exported JSON collection file (`Prostuti.postman_collection.json`).
-4. Click **Import** again to upload your environment variable file (`Prostuti.postman_environment.json`).
-5. In the top-right corner of Postman, ensure you select your newly imported environment from the environment dropdown menu.
+3. Select and upload the exported JSON collection file, which contains all the API requests and the test scripts (`Prostuti.postman_collection.json`).
+4. Click **Import** again to upload your environment variable file, which contains the variables needed to run the requests (`Prostuti.postman_environment.json`).
+5. In the top-right corner of Postman, make sure to select your newly imported environment from the environment dropdown menu.
 6. Select the Prostuti collection folder in your sidebar, click **Run Collection** and keep the iteration=1.
 
 ### Step 2: Running via CLI (Command Line Interface) with Newman Report
