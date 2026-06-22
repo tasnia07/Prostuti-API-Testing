@@ -40,4 +40,4 @@ newman run Prostuti.postman_collection.json -e Prostuti.postman_environment.json
 ```
 ### View Live HTML Reports
 You can view the latest automated test execution results directly online here:
-**[View Live Newman Test Report](https://tasnia07.github.io/Prostuti-API-Testing/Newman%20Report.html)**
+**[View Newman Test Report](https://tasnia07.github.io/Prostuti-API-Testing/Newman%20Report.html)**
